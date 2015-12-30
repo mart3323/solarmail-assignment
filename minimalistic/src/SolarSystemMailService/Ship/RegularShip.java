@@ -1,5 +1,6 @@
-package SolarSystemMailService;
+package SolarSystemMailService.Ship;
 
+import SolarSystemMailService.SolarMailPackage;
 import SolarSystemMailService.Station.PlanetaryStation;
 import SolarSystemMailService.Station.PlanetaryStation.TemperatureClass;
 import com.sun.istack.internal.NotNull;
@@ -14,11 +15,10 @@ public class RegularShip implements Ship {
 
     private static final int FULL_PERCENT = 100;
 
-    private static final int CARGO_CAPACITY = 100;
-    private static final int FUEL_COST_TO_LAUNCH = 20;
-    private static final int SCANNER_WEAR_ON_LAUNCH = 4;
+    protected int getCargoCapacity(){ return 100;}
+    protected static int SCANNER_WEAR_ON_LAUNCH = 4;
     /** The durability threshold above which new scanners should not be bought! */
-    private static final int SCANNER_PURCHASE_THRESHOLD = 10;
+    protected static int SCANNER_PURCHASE_THRESHOLD = 10;
 
     private int fuel = FULL_PERCENT;
     private int scannerDurability = FULL_PERCENT;
@@ -26,7 +26,11 @@ public class RegularShip implements Ship {
 
     @Override
     public Predicate<SolarMailPackage> canDeliver(){
-        return p -> this.getFuelCostToLaunch(p.destination.getTempClass()) < FULL_PERCENT;
+        return p -> this.canLandAt(p.destination);
+    }
+    @Override
+    public boolean canLandAt(PlanetaryStation station) {
+        return this.getFuelCostToLaunch(station.getTempClass()) < FULL_PERCENT;
     }
 
     @Override
@@ -58,7 +62,7 @@ public class RegularShip implements Ship {
     @Override
     public int getRemainingSpace() {
         synchronized (this.cargo) {
-            return CARGO_CAPACITY - this.browse().mapToInt(p -> p.weight).sum();
+            return getCargoCapacity() - this.browse().mapToInt(p -> p.weight).sum();
         }
     }
 
@@ -94,4 +98,5 @@ public class RegularShip implements Ship {
     public boolean needsNewScanner() {
         return this.scannerDurability < SCANNER_PURCHASE_THRESHOLD;
     }
+
 }

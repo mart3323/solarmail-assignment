@@ -1,11 +1,10 @@
 package SolarSystemMailService.Station;
 
-import SolarSystemMailService.Ship;
+import SolarSystemMailService.Ship.Ship;
 import SolarSystemMailService.SolarMailPackage;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Stream;
 
@@ -15,9 +14,9 @@ import static org.mockito.Mockito.*;
 
 public class PlanetaryStationTest {
 
-    PlanetaryStation station = new PlanetaryStation();
-    PlanetaryStation station2 = new PlanetaryStation();
-    PlanetaryStation station3 = new PlanetaryStation();
+    PlanetaryStation station = new PlanetaryStation("test");
+    PlanetaryStation station2 = new PlanetaryStation("test");
+    PlanetaryStation station3 = new PlanetaryStation("test");
     Ship ship = mock(Ship.class);
     private SolarMailPackage[] shipPackages = new SolarMailPackage[]{
             new SolarMailPackage(12, station2, station),

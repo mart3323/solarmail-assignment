@@ -1,17 +1,32 @@
 package SolarSystemMailService.Station;
 
 
-import SolarSystemMailService.Ship;
+import SolarSystemMailService.Ship.Ship;
 import SolarSystemMailService.SolarMailPackage;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static SolarSystemMailService.Station.PlanetaryStation.TemperatureClass.Normal;
 
 public class PlanetaryStation {
+
+    public final String name;
+
+    public static Stream<PlanetaryStation> browse() {
+        return PlanetaryStation.stations.stream();
+    }
+    public Stream<SolarMailPackage> browseOutbox() { return this.outbox.stream(); }
+
+    private static HashSet<PlanetaryStation> stations = new HashSet<>();
+    public PlanetaryStation(String name) {
+        this.stations.add(this);
+        this.name = name;
+    }
 
     public enum TemperatureClass {
         /** over 400K */ Hot,
@@ -27,9 +42,25 @@ public class PlanetaryStation {
 
     public TemperatureClass getTempClass() { return Normal; }
 
-    public final HashSet<SolarMailPackage> inbox = new HashSet<>();
-    public final HashSet<SolarMailPackage> outbox = new HashSet<>();
+    protected final HashSet<SolarMailPackage> inbox = new HashSet<>();
+    protected final HashSet<SolarMailPackage> outbox = new HashSet<>();
 
+    synchronized public void composeMail(PlanetaryStation destination, int weight){
+        this.outbox.add(new SolarMailPackage(weight, this, destination));
+    }
+
+    /**
+     * Performs the following actions
+     * <ul>
+     *     <li> Loads all packages sent to this planet off the ship
+     *     <li> Loads as many new packages onto the ship as possible, ordered by...
+     *     <ol>
+     *         <li> The ship has the most (by weight) packages for the same destination
+     *         <li> The package is the heaviest
+     *     </ol>
+     *     <li> Refuels the ship
+     * @param ship the ship to dock and perform these actions on
+     */
     synchronized public void dockAndTrade(Ship ship){
         synchronized (dockedShipSync){
             tradeWith(ship);
@@ -37,11 +68,31 @@ public class PlanetaryStation {
         }
     }
 
+    /** Returns the total amount of packages received by this station */
+    synchronized public int getReceivedPackagesAmount(){
+        return this.inbox.size();
+    }
+    /** Returns the total amount of packages received by this station that match the given filter */
+    synchronized public double getReceivedPackagesAmount(Predicate<SolarMailPackage> filter){
+        return this.inbox.parallelStream().filter(filter).count();
+    }
+    /** Returns the total weight of all packages received by this station */
+    synchronized public int getReceivedPackagesTotalWeight(){
+        return this.inbox.stream().mapToInt(p -> p.weight).sum();
+    }
+    /** Returns the average weight of all packages received by this station.., 0 if none received */
+    synchronized public double getReceivedPackagesAverageWeight(){
+        return this.inbox.stream().mapToInt(p -> p.weight).average().orElseGet(() -> 0);
+    }
+
+
     protected void tradeWith(Ship ship) {
-        ship.browse()
-            .filter(p -> p.destination == this)
-            .peek(ship::removeCargo)
-            .forEach(this.inbox::add);
+        final List<SolarMailPackage> packagesToRemove = ship.browse()
+                .filter(p -> p.destination == this)
+                .collect(Collectors.toList());
+        packagesToRemove.stream()
+                .peek(this.inbox::add)
+                .forEach(ship::removeCargo);
 
         final Map<PlanetaryStation, Integer> weightPerPlanet = ship.browse()
             .collect(Collectors.groupingBy(p -> p.destination, Collectors.summingInt(p -> p.weight)));

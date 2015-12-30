@@ -1,5 +1,6 @@
-package SolarSystemMailService;
+package SolarSystemMailService.Ship;
 
+import SolarSystemMailService.SolarMailPackage;
 import SolarSystemMailService.Station.PlanetaryStation;
 
 import java.util.function.Predicate;
@@ -23,4 +24,6 @@ public interface Ship {
     void installNewScanner();
 
     boolean needsNewScanner();
+
+    boolean canLandAt(PlanetaryStation station);
 }

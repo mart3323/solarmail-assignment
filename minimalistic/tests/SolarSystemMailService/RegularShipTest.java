@@ -1,5 +1,7 @@
 package SolarSystemMailService;
 
+import SolarSystemMailService.Ship.RegularShip;
+import SolarSystemMailService.Ship.Ship;
 import SolarSystemMailService.Station.PlanetaryStation;
 import org.junit.Assume;
 import org.junit.Before;
