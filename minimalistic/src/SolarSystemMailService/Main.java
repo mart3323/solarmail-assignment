@@ -33,18 +33,32 @@ public class Main {
         HashSet<Writer> writers = new HashSet<>();
         HashSet<Autopilot> ships = new HashSet<>();
         stations.forEach(station -> writers.add(new Writer(PACKAGES_PER_STATION, station)));
-        IntStream.range(1,21).forEach(i -> ships.add(new Autopilot("Ship "+i, new RegularShip())));
-        IntStream.range(1,5).forEach(i -> ships.add(new Autopilot("ShieldedShip "+i, new HeatShieldedShip())));
+        IntStream.range(1,15).forEach(i -> ships.add(new Autopilot("s"+i, new RegularShip())));
+        IntStream.range(1,5).forEach(i -> ships.add(new Autopilot("SS"+i, new HeatShieldedShip())));
 
-        final ExecutorService writerExecutor = Executors.newFixedThreadPool(20);
-        final ExecutorService shipExecutor = Executors.newFixedThreadPool(20);
+        final ExecutorService writerExecutor = Executors.newFixedThreadPool(30);
+        final ExecutorService shipExecutor = Executors.newFixedThreadPool(30);
         writers.forEach(writerExecutor::submit);
         ships.forEach(shipExecutor::submit);
 
         try {
+            System.out.println("Waiting for writers to complete");
+            writerExecutor.shutdown();
             writerExecutor.awaitTermination(10, SECONDS);
-            Thread.sleep(5000);
+            System.out.println("All packages instantiated, now waiting for deliveries");
+
+            int remainingPackages;
+            do{
+                Thread.sleep(100);
+                int packagesOnShips = ships.stream().mapToInt(s -> (int) s.ship.browse().count()).sum();
+                remainingPackages = stations.stream().mapToInt(s -> (int) s.browseOutbox().count()).sum()
+                + packagesOnShips;
+                synchronized (System.out){
+                    System.out.println(remainingPackages+"+"+packagesOnShips+" packages remaining to deliver");
+                }
+            }while(remainingPackages > 0);
             shipExecutor.shutdownNow();
+            System.out.println("Shutting down ships");
         } catch (InterruptedException ignored) { }
 
         System.out.println("Statistics");

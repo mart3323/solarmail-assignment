@@ -2,19 +2,22 @@ package SolarSystemMailService;
 
 import SolarSystemMailService.Ship.Ship;
 import SolarSystemMailService.Station.PlanetaryStation;
-import SolarSystemMailService.Station.ScannerSellingPlanetaryStation;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Autopilot extends Thread{
     public static final int MILLISECONDS_OF_FLIGHT = 15;
+    final Comparator<PlanetaryStation> hasMorePackagesToPickup = (s1, s2) -> (int)
+            (s1.browseOutbox().filter(this.ship.canDeliver()).count() -
+            s2.browseOutbox().filter(this.ship.canDeliver()).count());
+
     String name;
     Ship ship;
-
     public Autopilot(String name, Ship ship) {
         this.name = name;
         this.ship = ship;
@@ -24,9 +27,14 @@ public class Autopilot extends Thread{
     public void run() {
         try {
             while(true){
-                Thread.sleep(MILLISECONDS_OF_FLIGHT);
-                this.pickNewDestination().dockAndTrade(this.ship);
-                //System.out.println("Launching with "+this.ship.browse().count()+" cargo");
+                    final PlanetaryStation destination = this.pickNewDestination();
+                    if(destination != null){
+                        System.out.print(this.name+"("+this.ship.browse().count()+"|"+this.ship.browse().filter(p -> p.destination == destination).count()+") ");
+                        destination.dockAndTrade(this.ship);
+                        Thread.sleep(MILLISECONDS_OF_FLIGHT);
+                    } else {
+                        System.out.println("+");
+                    }
             }
         } catch (InterruptedException e) {
             System.err.println("Rocket \""+name+"\" interrupted, stopping");
@@ -34,27 +42,34 @@ public class Autopilot extends Thread{
     }
 
     private PlanetaryStation pickNewDestination() {
-        final boolean needsNewScanner = this.ship.needsNewScanner();
-        final Map<PlanetaryStation, Integer> weightPerValidDestination = this.ship.browse()
-            .filter(p -> !needsNewScanner || p.destination instanceof ScannerSellingPlanetaryStation)
-            .collect(
+            System.out.print("→");
+            return getWeightPerValidDestination()
+                    .entrySet()
+                    .stream()
+                    .sorted((a, b) -> b.getValue() - a.getValue())
+                    .filter(e -> e.getValue() > 0)
+                    .map(Entry::getKey)
+                    .findFirst() // Return
+                    .orElseGet(() -> {
+                                System.out.print("↓");
+                                return PlanetaryStation.browse()
+                                        .filter(this.ship::canLandAt)
+                                        .sorted(hasMorePackagesToPickup)
+                                        .findFirst() // Return
+                                        .orElseGet(() ->{
+                                            System.out.print("←");
+                                            return null;
+                                        });
+                            }
+                    );
+    }
+
+    private Map<PlanetaryStation, Integer> getWeightPerValidDestination() {
+        return this.ship.browse().collect(
                 Collectors.groupingBy(
-                    p -> p.destination,
-                    Collectors.summingInt(p -> p.weight)
+                        p -> p.destination,
+                        Collectors.summingInt(p -> p.weight)
                 )
-            );
-        final Optional<PlanetaryStation> chosenDestination = weightPerValidDestination
-                                                                        .entrySet()
-                                                                        .stream()
-                                                                        .sorted((a, b) -> a.getValue() - b.getValue())
-                                                                        .map(Entry::getKey)
-                                                                        .findFirst();
-        if(chosenDestination.isPresent()){
-            return chosenDestination.get();
-        } else {
-            return PlanetaryStation.browse().filter(
-                    station -> this.ship.canLandAt(station) && !needsNewScanner || station instanceof ScannerSellingPlanetaryStation
-            ).findAny().get();
-        }
+        );
     }
 }

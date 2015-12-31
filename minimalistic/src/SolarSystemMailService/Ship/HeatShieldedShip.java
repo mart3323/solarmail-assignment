@@ -7,6 +7,7 @@ import SolarSystemMailService.Station.PlanetaryStation.TemperatureClass;
 import java.util.function.Predicate;
 
 import static SolarSystemMailService.Station.PlanetaryStation.TemperatureClass.Hot;
+import static SolarSystemMailService.Station.PlanetaryStation.TemperatureClass.Normal;
 
 public class HeatShieldedShip extends RegularShip{
 
@@ -32,6 +33,6 @@ public class HeatShieldedShip extends RegularShip{
 
     @Override
     public boolean canLandAt(PlanetaryStation station) {
-        return station.getTempClass() == Hot;
+        return station.getTempClass() == Hot || station.getTempClass() == Normal;
     }
 }

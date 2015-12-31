@@ -24,12 +24,9 @@ public class Writer extends Thread{
                 Thread.sleep(MILLISECONDS_PER_PACKAGE);
                 createRandomPackage(station);
             }
-            System.out.println("Writer complete");
         } catch (InterruptedException e) {
-            System.err.println("Writer interrupted");
             e.printStackTrace();
         }
-        super.run();
     }
 
     public static void createRandomPackage(PlanetaryStation station){

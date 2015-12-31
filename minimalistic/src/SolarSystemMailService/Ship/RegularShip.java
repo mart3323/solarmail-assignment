@@ -3,6 +3,7 @@ package SolarSystemMailService.Ship;
 import SolarSystemMailService.SolarMailPackage;
 import SolarSystemMailService.Station.PlanetaryStation;
 import SolarSystemMailService.Station.PlanetaryStation.TemperatureClass;
+import SolarSystemMailService.Station.ScannerSellingPlanetaryStation;
 import com.sun.istack.internal.NotNull;
 import net.jcip.annotations.ThreadSafe;
 
@@ -30,7 +31,9 @@ public class RegularShip implements Ship {
     }
     @Override
     public boolean canLandAt(PlanetaryStation station) {
-        return this.getFuelCostToLaunch(station.getTempClass()) < FULL_PERCENT;
+        return this.getFuelCostToLaunch(station.getTempClass()) < FULL_PERCENT
+                &&
+            (!this.needsNewScanner() || station instanceof ScannerSellingPlanetaryStation);
     }
 
     @Override
