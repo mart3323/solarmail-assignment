@@ -7,6 +7,7 @@ import SolarSystemMailService.Station.PlanetaryStation;
 import SolarSystemMailService.Station.ScannerSellingPlanetaryStation;
 
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
@@ -33,31 +34,25 @@ public class Main {
         HashSet<Writer> writers = new HashSet<>();
         HashSet<Autopilot> ships = new HashSet<>();
         stations.forEach(station -> writers.add(new Writer(PACKAGES_PER_STATION, station)));
-        IntStream.range(1,15).forEach(i -> ships.add(new Autopilot("s"+i, new RegularShip())));
         IntStream.range(1,5).forEach(i -> ships.add(new Autopilot("SS"+i, new HeatShieldedShip())));
+        IntStream.range(1,15).forEach(i -> ships.add(new Autopilot("s"+i, new RegularShip())));
 
         final ExecutorService writerExecutor = Executors.newFixedThreadPool(30);
         final ExecutorService shipExecutor = Executors.newFixedThreadPool(30);
         writers.forEach(writerExecutor::submit);
         ships.forEach(shipExecutor::submit);
 
+        System.out.println(IntStream.range(0,20).mapToObj(a -> a).sorted((a, b) -> a - b).findFirst().get());
         try {
             System.out.println("Waiting for writers to complete");
             writerExecutor.shutdown();
             writerExecutor.awaitTermination(10, SECONDS);
-            System.out.println("All packages instantiated, now waiting for deliveries");
+            System.out.println("\nAll packages instantiated, now waiting for deliveries\n");
 
             int remainingPackages;
-            do{
-                Thread.sleep(100);
-                int packagesOnShips = ships.stream().mapToInt(s -> (int) s.ship.browse().count()).sum();
-                remainingPackages = stations.stream().mapToInt(s -> (int) s.browseOutbox().count()).sum()
-                + packagesOnShips;
-                synchronized (System.out){
-                    System.out.println(remainingPackages+"+"+packagesOnShips+" packages remaining to deliver");
-                }
-            }while(remainingPackages > 0);
+            new Scanner(System.in).nextLine();
             shipExecutor.shutdownNow();
+            ships.stream().forEach(Thread::interrupt);
             System.out.println("Shutting down ships");
         } catch (InterruptedException ignored) { }
 
@@ -68,6 +63,17 @@ public class Main {
         });
         final int deliveredPackages = stations.stream().mapToInt(PlanetaryStation::getReceivedPackagesAmount).sum();
         final int totalPackages = PACKAGES_PER_STATION * stations.size();
+        System.out.println("Packages on ships");
+        ships.stream().forEach(
+                s -> {
+                    System.out.println(s.ship.getClass().getSimpleName() + (s.ship.needsNewScanner() ? " Needs scanner" : ""));
+                    s.ship.browse().forEach(p -> System.out.println("    "+p.source.name+" → "+p.destination.name));
+                }
+        );
+        System.out.println("Packages on stations");
+        stations.stream().forEach(
+                s -> s.browseOutbox().forEach(p -> System.out.println("    " + p.source.name + " → " + p.destination.name))
+        );
 
         System.out.println("Total number of delivered packages: "+deliveredPackages+"/"+ totalPackages);
 

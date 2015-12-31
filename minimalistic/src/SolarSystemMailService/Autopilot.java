@@ -1,7 +1,9 @@
 package SolarSystemMailService;
 
+import SolarSystemMailService.Ship.HeatShieldedShip;
 import SolarSystemMailService.Ship.Ship;
 import SolarSystemMailService.Station.PlanetaryStation;
+import SolarSystemMailService.Station.ScannerSellingPlanetaryStation;
 
 import java.util.Comparator;
 import java.util.List;
@@ -12,12 +14,14 @@ import java.util.stream.Collectors;
 
 public class Autopilot extends Thread{
     public static final int MILLISECONDS_OF_FLIGHT = 15;
-    final Comparator<PlanetaryStation> hasMorePackagesToPickup = (s1, s2) -> (int)
-            (s1.browseOutbox().filter(this.ship.canDeliver()).count() -
-            s2.browseOutbox().filter(this.ship.canDeliver()).count());
+    final Comparator<PlanetaryStation> hasMorePackagesToPickup() {
+        return (s1, s2) -> (int)
+                (s2.browseOutbox().filter(this.ship.canDeliver()).count() -
+                        s1.browseOutbox().filter(this.ship.canDeliver()).count());
+    }
 
-    String name;
-    Ship ship;
+    final String name;
+    final Ship ship;
     public Autopilot(String name, Ship ship) {
         this.name = name;
         this.ship = ship;
@@ -26,50 +30,54 @@ public class Autopilot extends Thread{
     @Override
     public void run() {
         try {
-            while(true){
-                    final PlanetaryStation destination = this.pickNewDestination();
-                    if(destination != null){
-                        System.out.print(this.name+"("+this.ship.browse().count()+"|"+this.ship.browse().filter(p -> p.destination == destination).count()+") ");
-                        destination.dockAndTrade(this.ship);
-                        Thread.sleep(MILLISECONDS_OF_FLIGHT);
-                    } else {
-                        System.out.println("+");
-                    }
+            while (!interrupted()) {
+                final PlanetaryStation destination = this.pickNewDestination();
+                if (destination != null && this.ship.canLandAt(destination)) {
+                    destination.dockAndTrade(this.ship);
+                }
+                Thread.sleep(MILLISECONDS_OF_FLIGHT);
             }
+            System.out.println(this.name+" stopped");
+        } catch (RuntimeException e) {
+            e.printStackTrace();
         } catch (InterruptedException e) {
-            System.err.println("Rocket \""+name+"\" interrupted, stopping");
+            System.err.println("Rocket \"" + name + "\" interrupted, stopping");
         }
     }
 
     private PlanetaryStation pickNewDestination() {
-            System.out.print("→");
-            return getWeightPerValidDestination()
-                    .entrySet()
-                    .stream()
+        if(this.ship instanceof HeatShieldedShip){
+            System.out.print("");
+        }
+        synchronized (PlanetaryStation.class){
+            return getWeightPerValidDestination().entrySet().stream()
                     .sorted((a, b) -> b.getValue() - a.getValue())
-                    .filter(e -> e.getValue() > 0)
                     .map(Entry::getKey)
-                    .findFirst() // Return
-                    .orElseGet(() -> {
-                                System.out.print("↓");
-                                return PlanetaryStation.browse()
-                                        .filter(this.ship::canLandAt)
-                                        .sorted(hasMorePackagesToPickup)
-                                        .findFirst() // Return
-                                        .orElseGet(() ->{
-                                            System.out.print("←");
-                                            return null;
-                                        });
-                            }
+                    .filter(this.ship::canLandAt)
+                    .findFirst()
+                    .orElseGet(() ->
+                                    PlanetaryStation.browse()
+                                            .filter(this.ship::canLandAt)
+                                            .peek(s -> System.out.print(s.name + "→"))
+                                            .filter(s -> s.browseOutbox().filter(this.ship.canDeliver()).count() > 0)
+                                            .peek(s -> System.out.print("←"))
+                                            .sorted(hasMorePackagesToPickup())
+                                            .findFirst() // Return
+
+                                            .orElseGet(() ->
+                                                            null
+                                            )
                     );
+        }
     }
 
     private Map<PlanetaryStation, Integer> getWeightPerValidDestination() {
-        return this.ship.browse().collect(
-                Collectors.groupingBy(
-                        p -> p.destination,
-                        Collectors.summingInt(p -> p.weight)
-                )
-        );
+        return this.ship.browse()
+                .collect(
+                        Collectors.groupingBy(
+                            p -> p.destination,
+                            Collectors.summingInt(p -> p.weight)
+                        )
+                );
     }
 }

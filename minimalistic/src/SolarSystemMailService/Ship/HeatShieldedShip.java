@@ -3,6 +3,7 @@ package SolarSystemMailService.Ship;
 import SolarSystemMailService.SolarMailPackage;
 import SolarSystemMailService.Station.PlanetaryStation;
 import SolarSystemMailService.Station.PlanetaryStation.TemperatureClass;
+import SolarSystemMailService.Station.ScannerSellingPlanetaryStation;
 
 import java.util.function.Predicate;
 
@@ -32,7 +33,9 @@ public class HeatShieldedShip extends RegularShip{
     }
 
     @Override
-    public boolean canLandAt(PlanetaryStation station) {
-        return station.getTempClass() == Hot || station.getTempClass() == Normal;
+    synchronized public boolean canLandAt(PlanetaryStation station) {
+        return station.getTempClass() == Hot || station.getTempClass() == Normal
+            &&
+        (!this.needsNewScanner() || station instanceof ScannerSellingPlanetaryStation);
     }
 }

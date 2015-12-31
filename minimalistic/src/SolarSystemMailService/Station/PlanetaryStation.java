@@ -15,16 +15,29 @@ import static SolarSystemMailService.Station.PlanetaryStation.TemperatureClass.N
 
 public class PlanetaryStation {
 
+
+    /**
+     * All actions that require a ship to dock must synchronize on this object.., this ensures that only one ship
+     * can dock and be serviced at any one time
+     */
+    private final Object dockedShipSync = new Object();
     public final String name;
+
+    protected final HashSet<SolarMailPackage> inbox = new HashSet<>();
+    protected final HashSet<SolarMailPackage> outbox = new HashSet<>();
+    private static HashSet<PlanetaryStation> stations = new HashSet<>();
 
     public static Stream<PlanetaryStation> browse() {
         return PlanetaryStation.stations.stream();
     }
-    public Stream<SolarMailPackage> browseOutbox() { return this.outbox.stream(); }
+    public Stream<SolarMailPackage> browseOutbox() {
+        synchronized (this.outbox){
+            return ((HashSet<SolarMailPackage>)this.outbox.clone()).stream();
+        }
+    }
 
-    private static HashSet<PlanetaryStation> stations = new HashSet<>();
     public PlanetaryStation(String name) {
-        this.stations.add(this);
+        stations.add(this);
         this.name = name;
     }
 
@@ -34,19 +47,12 @@ public class PlanetaryStation {
         /** under 100K */ Cold;
     }
 
-    /**
-     * All actions that require a ship to dock must synchronize on this object.., this ensures that only one ship
-     * can dock and be serviced at any one time
-     */
-    private final Object dockedShipSync = new Object();
-
     public TemperatureClass getTempClass() { return Normal; }
 
-    protected final HashSet<SolarMailPackage> inbox = new HashSet<>();
-    protected final HashSet<SolarMailPackage> outbox = new HashSet<>();
-
     synchronized public void composeMail(PlanetaryStation destination, int weight){
-        this.outbox.add(new SolarMailPackage(weight, this, destination));
+        synchronized (this.outbox){
+            this.outbox.add(new SolarMailPackage(weight, this, destination));
+        }
     }
 
     /**
@@ -69,8 +75,10 @@ public class PlanetaryStation {
     }
 
     /** Returns the total amount of packages received by this station */
-    synchronized public int getReceivedPackagesAmount(){
-        return this.inbox.size();
+    public int getReceivedPackagesAmount(){
+        synchronized (this.inbox){
+            return this.inbox.size();
+        }
     }
     /** Returns the total amount of packages received by this station that match the given filter */
     synchronized public double getReceivedPackagesAmount(Predicate<SolarMailPackage> filter){
@@ -102,7 +110,7 @@ public class PlanetaryStation {
             .sorted((o1, o2) -> o2.getValue() - o1.getValue())
             .map(Map.Entry::getKey)
             .forEachOrdered((planetaryStation) -> loadCargoForDestination(ship, planetaryStation));
-        ((HashSet<SolarMailPackage>)outbox.clone()).stream()
+        this.browseOutbox()
             .filter(ship.canDeliver())
             .forEach(p -> attemptLoadIntoShip(p, ship));
         ship.refuel();
@@ -116,10 +124,13 @@ public class PlanetaryStation {
      * @param destination the destination for which to load packages
      */
     private void loadCargoForDestination(Ship ship, PlanetaryStation destination) {
-        this.outbox.parallelStream()
-                .filter(p -> p.destination == destination)
-                .sorted((p1, p2) -> p2.weight - p1.weight)
-                .forEach(p -> attemptLoadIntoShip(p, ship));
+        synchronized (this.outbox) {
+            this.outbox.parallelStream()
+                    .filter(p -> p.destination == destination)
+                    .filter(ship.canDeliver())
+                    .sorted((p1, p2) -> p2.weight - p1.weight)
+                    .forEach(p -> attemptLoadIntoShip(p, ship));
+        }
     }
 
     /**

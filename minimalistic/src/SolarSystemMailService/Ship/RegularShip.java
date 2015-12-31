@@ -11,7 +11,8 @@ import java.util.HashSet;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@ThreadSafe
+import static SolarSystemMailService.Station.PlanetaryStation.TemperatureClass.Normal;
+
 public class RegularShip implements Ship {
 
     private static final int FULL_PERCENT = 100;
@@ -27,11 +28,12 @@ public class RegularShip implements Ship {
 
     @Override
     public Predicate<SolarMailPackage> canDeliver(){
-        return p -> this.canLandAt(p.destination);
+        return (p) -> p.destination.getTempClass() == Normal;
     }
+
     @Override
-    public boolean canLandAt(PlanetaryStation station) {
-        return this.getFuelCostToLaunch(station.getTempClass()) < FULL_PERCENT
+    synchronized public boolean canLandAt(PlanetaryStation station) {
+        return station.getTempClass() == Normal
                 &&
             (!this.needsNewScanner() || station instanceof ScannerSellingPlanetaryStation);
     }
@@ -46,6 +48,9 @@ public class RegularShip implements Ship {
     @Override
     public void addCargo(@NotNull SolarMailPackage pckg) {
         synchronized (this.cargo){
+            if(!this.canDeliver().test(pckg)){
+                throw new RuntimeException("Loaded package that this ship can not deliver");
+            }
             this.cargo.add(pckg);
         }
     }
@@ -58,19 +63,19 @@ public class RegularShip implements Ship {
     }
 
     @Override
-    public void refuel() {
+    synchronized public void refuel() {
         this.fuel = FULL_PERCENT;
     }
 
     @Override
-    public int getRemainingSpace() {
+    synchronized public int getRemainingSpace() {
         synchronized (this.cargo) {
             return getCargoCapacity() - this.browse().mapToInt(p -> p.weight).sum();
         }
     }
 
     @Override
-    public void launch(PlanetaryStation from) {
+    synchronized public void launch(PlanetaryStation from) {
         final double fuelCost = this.getFuelCostToLaunch(from.getTempClass());
         if(this.fuel < fuelCost){
             throw new RuntimeException("Ship cannot launch, not enough fuel");
@@ -93,12 +98,12 @@ public class RegularShip implements Ship {
     }
 
     @Override
-    public void installNewScanner(){
+    synchronized public void installNewScanner(){
         this.scannerDurability = FULL_PERCENT;
     }
 
     @Override
-    public boolean needsNewScanner() {
+    synchronized public boolean needsNewScanner() {
         return this.scannerDurability < SCANNER_PURCHASE_THRESHOLD;
     }
 
