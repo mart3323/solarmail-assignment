@@ -19,7 +19,7 @@ public class Writer extends Thread{
     @Override
     public void run() {
         try {
-            for (int i = 0; i < 25; i++) {
+            for (int i = 0; i < 250; i++) {
                 target.addPackage(this.getRandomDest(), this.getRandomWeight());
                 Thread.sleep(2);
             }

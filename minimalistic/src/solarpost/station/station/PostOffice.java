@@ -6,9 +6,9 @@ import solarpost.ship.ship.AbstractShip;
 import solarpost.misc.SolarMail;
 
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static solarpost.station.station.AbstractPostOffice.TempClass.Hot;
 import static solarpost.station.station.AbstractPostOffice.TempClass.Normal;
 
 public class PostOffice extends AbstractPostOffice{
@@ -20,7 +20,7 @@ public class PostOffice extends AbstractPostOffice{
     @Override public TempClass getTempClass() { return Normal; }
 
     @Override
-    protected void doTrade(CargoStorage ship) {
+    protected void doTrade(CargoStorage ship, Predicate<SolarMail> filter) {
         // Remove packages for this station
         ship.getItems().stream()
                 .filter(p -> p.target == this)
@@ -35,11 +35,14 @@ public class PostOffice extends AbstractPostOffice{
                 .forEachOrdered(station ->
                                 this.outbox.getItems().stream()
                                         .filter(p -> p.target == station)
+                                        .filter(filter)
                                         .sorted((p1, p2) -> p2.weight - p1.weight)
                                         .forEachOrdered(p -> tryLoadOntoShip(ship, p))
                 );
         // Load any other packages that fit
-        this.outbox.getItems().forEach(p -> tryLoadOntoShip(ship, p));
+        this.outbox.getItems().stream()
+                .filter(filter)
+                .forEach(p -> tryLoadOntoShip(ship, p));
     }
 
 

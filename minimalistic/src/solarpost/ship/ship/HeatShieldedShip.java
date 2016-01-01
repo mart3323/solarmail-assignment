@@ -1,11 +1,6 @@
 package solarpost.ship.ship;
 
-import solarpost.misc.SolarMail;
 import solarpost.station.station.AbstractPostOffice;
-import solarpost.station.station.PostOffice;
-
-import static solarpost.station.station.AbstractPostOffice.TempClass.Hot;
-import static solarpost.station.station.AbstractPostOffice.TempClass.Normal;
 
 public class HeatShieldedShip extends AbstractShip{
     @Override protected int getMaxScanner() { return 100; }
@@ -30,8 +25,4 @@ public class HeatShieldedShip extends AbstractShip{
         }
     }
 
-    @Override
-    public boolean canDeliver(SolarMail pckg) {
-        return pckg.source.getTempClass() == Hot || pckg.target.getTempClass() == Hot;
-    }
 }
