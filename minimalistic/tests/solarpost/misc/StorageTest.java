@@ -1,16 +1,14 @@
-package misc;
+package solarpost.misc;
 
 import org.junit.Before;
 import org.junit.Test;
+import solarpost.misc.Storage;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by mart3323 on 1/2/16.
- */
 public class StorageTest {
 
     private Storage<Integer> storage;

@@ -1,6 +1,6 @@
-package solarpost.station.station;
+package solarpost.station;
 
-import static solarpost.station.station.AbstractPostOffice.TempClass.Hot;
+import static solarpost.station.AbstractPostOffice.TempClass.Hot;
 
 public class HotPostOffice extends PostOffice{
     public HotPostOffice(String name) {

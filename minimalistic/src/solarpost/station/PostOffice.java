@@ -1,15 +1,15 @@
-package solarpost.station.station;
+package solarpost.station;
 
 
 import solarpost.misc.CargoStorage;
-import solarpost.ship.ship.CargoShip;
+import solarpost.ship.CargoShip;
 import solarpost.misc.SolarMail;
 
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static solarpost.station.station.AbstractPostOffice.TempClass.Normal;
+import static solarpost.station.AbstractPostOffice.TempClass.Normal;
 
 public class PostOffice extends AbstractPostOffice{
 

@@ -1,9 +1,9 @@
-package solarpost.ship;
+package solarpost.solarsystem;
 
 import solarpost.misc.SolarMail;
 import solarpost.route.Node;
-import solarpost.ship.ship.CargoShip;
-import solarpost.station.station.ScannerPostOffice;
+import solarpost.ship.CargoShip;
+import solarpost.station.ScannerPostOffice;
 
 public class AutoPilot extends Thread{
     public static final int FLIGHT_TIME_MS = 15;

@@ -1,27 +1,27 @@
 package solarpost.misc;
 
-import misc.Storage;
+import interfaces.misc.ICargoStorage;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
-public class CargoStorage {
+public class CargoStorage implements ICargoStorage {
     private final int capacity;
     private Storage<SolarMail> items = new Storage<>();
 
     public CargoStorage(int i) {
         capacity = i;
     }
-    public ReentrantReadWriteLock getLock(){
+    public ReentrantReadWriteLock getLock() throws IllegalStateException {
         return this.items.getLock();
     }
-    public Set<SolarMail> getItems(){
+    public Set<SolarMail> getItems() throws IllegalStateException {
         assertReadLock();
         return items.getItemsBy(solarMail -> true);
     }
 
-    public boolean tryAdd(SolarMail mail){
+    public boolean tryAdd(SolarMail mail) throws IllegalStateException {
         assertWriteLock();
         if (this.capacity >= this.getItems().stream().mapToInt(p -> p.weight).sum() + mail.weight) {
             this.items.add(mail);
@@ -29,12 +29,12 @@ public class CargoStorage {
         }
         return false;
     }
-    public void add(SolarMail mail){
+    public void add(SolarMail mail) throws IllegalStateException, RuntimeException {
         if(!this.tryAdd(mail)){
             throw new RuntimeException("used .add but broke capacity (use tryAdd instead)");
         }
     }
-    public void remove(SolarMail mail){
+    public void remove(SolarMail mail) throws IllegalStateException{
         assertWriteLock();
         this.items.remove(mail);
     }

@@ -1,4 +1,6 @@
-package misc;
+package solarpost.misc;
+
+import interfaces.misc.IStorage;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,7 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Storage<T> {
+public class Storage<T> implements IStorage<T> {
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
     HashSet<T> items = new HashSet<>();
 

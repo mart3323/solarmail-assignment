@@ -1,17 +1,15 @@
-package solarpost;
+package solarpost.solarsystem;
 
 import solarpost.misc.CargoStorage;
 import solarpost.route.Node;
 import solarpost.route.Route;
-import solarpost.ship.AutoPilot;
-import solarpost.ship.ship.CargoShip;
-import solarpost.ship.ship.HeatShieldedHull;
-import solarpost.ship.ship.RegularHull;
-import solarpost.station.Writer;
-import solarpost.station.station.AbstractPostOffice;
-import solarpost.station.station.HotPostOffice;
-import solarpost.station.station.PostOffice;
-import solarpost.station.station.ScannerPostOffice;
+import solarpost.ship.CargoShip;
+import solarpost.ship.HeatShieldedHull;
+import solarpost.ship.RegularHull;
+import solarpost.station.AbstractPostOffice;
+import solarpost.station.HotPostOffice;
+import solarpost.station.PostOffice;
+import solarpost.station.ScannerPostOffice;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -19,9 +17,9 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static solarpost.station.station.AbstractPostOffice.TempClass.Normal;
+import static solarpost.station.AbstractPostOffice.TempClass.Normal;
 
-public class Test {
+public class Main {
 
     public static Node everywhereRoute(ArrayList<AbstractPostOffice> stations){
         return Route.create(stations.toArray(new AbstractPostOffice[stations.size()]));

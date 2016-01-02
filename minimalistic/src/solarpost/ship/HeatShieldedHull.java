@@ -1,15 +1,15 @@
-package solarpost.ship.ship;
+package solarpost.ship;
 
-import solarpost.station.station.AbstractPostOffice;
+import interfaces.ship.IHullProfile;
+import solarpost.station.AbstractPostOffice;
 
 import java.util.function.Function;
 
-
-public class RegularHull implements IHullProfile {
+public class HeatShieldedHull implements IHullProfile {
 
     @Override public int getMaxFuel() { return 100; }
     @Override public int getMaxScanner() { return 100; }
-    @Override public int getCargoCapacity() { return 100; }
+    @Override public int getCargoCapacity() { return 80; }
 
     @Override
     public Function<AbstractPostOffice, Integer> getScannerWearPattern() {
@@ -20,12 +20,13 @@ public class RegularHull implements IHullProfile {
     public Function<AbstractPostOffice, Integer> getFuelConsumptionPattern() {
         return p -> {
             switch (p.getTempClass()) {
+                case Hot:
+                    return 50;
                 case Normal:
-                    return 20;
+                    return 25;
                 default:
                     return getMaxFuel()+1;
             }
         };
     }
-
 }

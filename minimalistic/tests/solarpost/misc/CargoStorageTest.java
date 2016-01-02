@@ -2,7 +2,7 @@ package solarpost.misc;
 
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import solarpost.station.station.AbstractPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

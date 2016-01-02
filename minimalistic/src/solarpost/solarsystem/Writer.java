@@ -1,9 +1,8 @@
-package solarpost.station;
+package solarpost.solarsystem;
 
-import solarpost.station.station.AbstractPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class Writer extends Thread{

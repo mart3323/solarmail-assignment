@@ -1,8 +1,8 @@
-package solarpost.station.station;
+package solarpost.station;
 
 import solarpost.misc.CargoStorage;
 import solarpost.misc.SolarMail;
-import solarpost.ship.ship.CargoShip;
+import solarpost.ship.CargoShip;
 
 import java.util.AbstractMap;
 import java.util.HashMap;

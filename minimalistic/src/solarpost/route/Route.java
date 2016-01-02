@@ -1,6 +1,6 @@
 package solarpost.route;
 
-import solarpost.station.station.AbstractPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 public class Route {
     /**

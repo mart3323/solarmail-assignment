@@ -1,7 +1,7 @@
 package solarpost.route;
 
 import org.junit.Test;
-import solarpost.station.station.AbstractPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;

@@ -1,6 +1,6 @@
 package solarpost.route;
 
-import solarpost.station.station.AbstractPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 /**
  * This is essentially a linked list node, but specifically for {@link AbstractPostOffice}s,

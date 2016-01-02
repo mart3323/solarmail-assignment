@@ -1,14 +1,15 @@
-package solarpost.ship.ship;
+package solarpost.ship;
 
+import interfaces.ship.ICargoShip;
+import interfaces.ship.IHullProfile;
 import solarpost.misc.CargoStorage;
 import solarpost.misc.SolarMail;
-import solarpost.station.station.AbstractPostOffice;
-import solarpost.station.station.ScannerPostOffice;
+import solarpost.station.AbstractPostOffice;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class CargoShip {
+public class CargoShip implements ICargoShip{
     protected final CargoStorage storage;
     public boolean autobuyScanner = false;
     private int fuel;
@@ -18,6 +19,9 @@ public class CargoShip {
     private final Function<AbstractPostOffice, Integer> scannerWear;
     private final Function<AbstractPostOffice, Integer> fuelConsumption;
 
+    /**
+     * Builds a new ship according to the specified Hull profile
+     */
     public CargoShip(IHullProfile hull) {
         this.MAX_FUEL = hull.getMaxFuel();
         this.MAX_SCANNER = hull.getMaxScanner();
