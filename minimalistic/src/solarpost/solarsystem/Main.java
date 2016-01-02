@@ -16,10 +16,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static solarpost.station.AbstractPostOffice.TempClass.Normal;
 
 public class Main {
+
+    public static final String RESET_LINE = "1%\r";
 
     public static Node everywhereRoute(ArrayList<AbstractPostOffice> stations){
         return Route.create(stations.toArray(new AbstractPostOffice[stations.size()]));
@@ -48,50 +49,46 @@ public class Main {
         final ExecutorService shipExecutor = Executors.newFixedThreadPool(30);
 
         ArrayList<AutoPilot> ships = new ArrayList<>();
-        ships.add(new AutoPilot("r1", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r2", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r3", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r4", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r5", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r6", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r7", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r8", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r9", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r10", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r11", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r12", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r13", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r14", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("r15", new CargoShip(new RegularHull()), notHotRoute(stations)));
-        ships.add(new AutoPilot("S1", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
-        ships.add(new AutoPilot("S2", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
-        ships.add(new AutoPilot("S2", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
-        ships.add(new AutoPilot("S3", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
-        ships.add(new AutoPilot("S4", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
-        ships.add(new AutoPilot("S5", new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
+        for (int i = 1; i < 21; i++) {
+            ships.add(new AutoPilot("r"+i, new CargoShip(new RegularHull()), notHotRoute(stations)));
+        }
+        for (int i = 1; i < 6; i++) {
+            ships.add(new AutoPilot("S"+i, new CargoShip(new HeatShieldedHull()), everywhereRoute(stations)));
+        }
+        final Writer writer = new Writer(stations);
 
-        List<Writer> writers = stations.stream().map(station -> new Writer(station, stations)).collect(Collectors.toList());
-        writers.forEach(writerExecutor::submit);
+        writer.start();
         ships.forEach(shipExecutor::submit);
 
-        writerExecutor.shutdown();
-        final boolean writersFinished = writerExecutor.awaitTermination(20, SECONDS);
-        System.out.println(writersFinished ? "Writers done" : "Writers stopped prematurely");
-        while(true){
+        System.out.println("unwritten → waiting → in_transit → delivered");
+        while(worldIsAlive(stations, ships, writer) || writer.isAlive()){
             Thread.sleep(500);
-            if (logWorldStatus(stations, ships)) break;
         }
+        System.out.println();
+
         shipExecutor.shutdownNow();
+
         System.out.println("  Stations' mail statistics  ");
-        stations.stream().forEach(AbstractPostOffice::DEBUG_log_items);
+        stations.stream().forEach(station -> {
+            final Integer inWeight = station.getInbox(p -> true, Collectors.summingInt(p -> p.weight));
+            final Integer count = station.getInbox(p -> true, Collectors.summingInt(p -> 1));
+            final Integer outCount = station.getOutbox(p -> true, Collectors.summingInt(p -> 1));
+            System.out.printf("%-20s has received %4d packages for a total weight of %5d and has %2d packages still awaiting delivery%n",
+                    station.name, count, inWeight, outCount);
+        });
+
         System.out.println("  Ships' final statuses  ");
         ships.stream().forEach(autoPilot -> {
-            final CargoStorage shipStorage = autoPilot.ship.getStorage();
             final CargoShip ship = autoPilot.ship;
+            final CargoStorage shipStorage = ship.getStorage();
             shipStorage.getLock().readLock().lock();
-            System.out.println("Ship " + autoPilot.name + " fuel/scanner/packages " +
-                    ship.getFuel() + "/" + ship.getScannerDurability() + "/" + ship.getStorage().getItems().size());
+                final int items = ship.getStorage().getItems().size();
             shipStorage.getLock().readLock().unlock();
+            System.out.printf("Ship %3s %2d fuel, %2d scanner, %2d packages %n",
+                        autoPilot.name,
+                        ship.getFuel(),
+                        ship.getScannerDurability(),
+                        items);
         });
     }
 
@@ -99,16 +96,15 @@ public class Main {
      * Logs the world status of packages (waiting, in transit, and delivered)
      * @return true if all packages are delivered (none are waiting or in cargo)
      */
-    private static boolean logWorldStatus(ArrayList<AbstractPostOffice> stations, ArrayList<AutoPilot> ships) {
+    private static boolean worldIsAlive(ArrayList<AbstractPostOffice> stations, ArrayList<AutoPilot> ships, Writer writer) {
         // Yes, i don't lock the world.., but i check stations first..,
         // so if all stations are empty, and then after that all ships are empty,
         // then the packages must have been delivered, because packages can't move upstream or horizontally
         int delivered = 0;
         int waiting = 0;
         for (AbstractPostOffice station : stations) {
-            final AbstractMap.SimpleEntry<Integer, Integer> entry = station.DEBUG_get_items();
-            delivered += entry.getKey();
-            waiting += entry.getValue();
+            delivered += station.getInbox(p -> true, Collectors.summingInt(p -> 1));
+            waiting += station.getOutbox(p -> true, Collectors.summingInt(p -> 1));
         }
         int transit = 0;
         for (AutoPilot ship : ships) {
@@ -117,7 +113,9 @@ public class Main {
             transit += shipCargo.getItems().size();
             shipCargo.getLock().readLock().unlock();
         }
-        System.out.println(waiting+" → "+transit+" → "+delivered+" waiting → in transit → delivered");
-        return transit + waiting == 0;
+        System.out.print(RESET_LINE);
+        final int notWritten = writer.getToWrite();
+        System.out.printf("%4d → %4d → %4d → %4d ", notWritten, waiting, transit, delivered);
+        return notWritten + transit + waiting > 0;
     }
 }

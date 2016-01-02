@@ -6,7 +6,9 @@ import solarpost.ship.CargoShip;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 
 public abstract class AbstractPostOffice {
     CargoStorage outbox = new CargoStorage(Integer.MAX_VALUE);
@@ -16,23 +18,6 @@ public abstract class AbstractPostOffice {
         this.outbox.getLock().writeLock().lock();
         this.outbox.add(new SolarMail(this, target, weight));
         this.outbox.getLock().writeLock().unlock();
-    }
-
-    public void DEBUG_log_items() {
-        this.inbox.getLock().readLock().lock();
-        this.outbox.getLock().readLock().lock();
-        System.out.println("Station "+name+" has inbox/outbox "+this.inbox.getItems().size()+"/"+this.outbox.getItems().size());
-        this.outbox.getLock().readLock().unlock();
-        this.inbox.getLock().readLock().unlock();
-    }
-    /** Returns inbox, outbox pair */
-    public HashMap.SimpleEntry<Integer, Integer> DEBUG_get_items(){
-        this.inbox.getLock().readLock().lock();
-        this.outbox.getLock().readLock().lock();
-        final AbstractMap.SimpleEntry<Integer, Integer> simpleEntry = new HashMap.SimpleEntry(this.inbox.getItems().size(), this.outbox.getItems().size());
-        this.outbox.getLock().readLock().unlock();
-        this.inbox.getLock().readLock().unlock();
-        return simpleEntry;
     }
 
     public enum TempClass { Hot, Normal, Cold;}
@@ -62,9 +47,22 @@ public abstract class AbstractPostOffice {
     }
 
     protected void beforeTrade(CargoShip ship){}
-
     protected abstract void doTrade(CargoStorage ship, Predicate<SolarMail> filter);
-
     protected void afterTrade(CargoShip ship){}
+
+    public <T,Q> T getInbox(Predicate<SolarMail> filter, Collector<? super SolarMail, Q, T> collector){
+        return threadSafeRead(this.inbox).parallelStream().filter(filter).collect(collector);
+    }
+    public <T,Q> T getOutbox(Predicate<SolarMail> filter, Collector<? super SolarMail, Q, T> collector){
+        return threadSafeRead(this.outbox).parallelStream().filter(filter).collect(collector);
+    }
+
+    private Set<SolarMail> threadSafeRead(CargoStorage storage) {
+        storage.getLock().readLock().lock();
+        final Set<SolarMail> items = storage.getItems();
+        storage.getLock().readLock().unlock();
+        return items;
+    }
+
 
 }
