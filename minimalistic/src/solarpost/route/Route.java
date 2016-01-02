@@ -2,10 +2,12 @@ package solarpost.route;
 
 import solarpost.station.station.AbstractPostOffice;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 public class Route {
+    /**
+     * Construct a circular linked list of {@link Node}s in the order given, with the last connected to the first
+     * @param stations stations to make {@link Node}s of
+     * @return the first Node of the circular linked list
+     */
     public static Node create(AbstractPostOffice... stations){
         Node[] nodes = new Node[stations.length];
         for (int i = 0; i < stations.length; i++) {

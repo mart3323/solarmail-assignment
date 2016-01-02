@@ -2,6 +2,10 @@ package solarpost.route;
 
 import solarpost.station.station.AbstractPostOffice;
 
+/**
+ * This is essentially a linked list node, but specifically for {@link AbstractPostOffice}s,
+ * and without convenience methods, just public fields
+ */
 public class Node {
     public Node next;
     public Node last;

@@ -5,6 +5,7 @@ import misc.Storage;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+
 public class CargoStorage {
     private final int capacity;
     private Storage<SolarMail> items = new Storage<>();
