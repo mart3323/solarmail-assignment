@@ -2,7 +2,7 @@ package solarpost.station.station;
 
 
 import solarpost.misc.CargoStorage;
-import solarpost.ship.ship.AbstractShip;
+import solarpost.ship.ship.CargoShip;
 import solarpost.misc.SolarMail;
 
 import java.util.Map;
@@ -47,7 +47,7 @@ public class PostOffice extends AbstractPostOffice{
 
 
     @Override
-    protected void afterTrade(AbstractShip ship) {
+    protected void afterTrade(CargoShip ship) {
         ship.refuel();
     }
 

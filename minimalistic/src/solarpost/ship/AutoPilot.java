@@ -2,17 +2,18 @@ package solarpost.ship;
 
 import solarpost.misc.SolarMail;
 import solarpost.route.Node;
-import solarpost.ship.ship.AbstractShip;
+import solarpost.ship.ship.CargoShip;
 import solarpost.station.station.ScannerPostOffice;
 
 public class AutoPilot extends Thread{
     public static final int FLIGHT_TIME_MS = 15;
+    public static final int SCANNER_CHANGE_THRESHOLD = 10;
     public final String name;
-    public final AbstractShip ship;
+    public final CargoShip ship;
     private Node route;
 
 
-    public AutoPilot(String name, AbstractShip ship, Node route) {
+    public AutoPilot(String name, CargoShip ship, Node route) {
         this.name = name;
         this.ship = ship;
         this.route = route;
@@ -22,6 +23,7 @@ public class AutoPilot extends Thread{
     public void run() {
         try {
             while(!interrupted()){
+                this.ship.autobuyScanner = needScanner();
                 this.ship.dockAt(this.route.postOffice, this::packageIsOnRoute);
                 selectNextDestination();
                 Thread.sleep(FLIGHT_TIME_MS);
@@ -31,13 +33,17 @@ public class AutoPilot extends Thread{
     }
 
     private void selectNextDestination() {
-        if(this.ship.needsScanner()){
+        if(needScanner()){
             do {
                 this.route = this.route.next;
             } while(!(this.route.postOffice instanceof ScannerPostOffice));
         } else {
             this.route = this.route.next;
         }
+    }
+
+    private boolean needScanner() {
+        return this.ship.getScannerDurability() < SCANNER_CHANGE_THRESHOLD;
     }
 
     private boolean packageIsOnRoute(SolarMail pckg){

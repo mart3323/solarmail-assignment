@@ -2,7 +2,7 @@ package solarpost.station.station;
 
 import solarpost.misc.CargoStorage;
 import solarpost.misc.SolarMail;
-import solarpost.ship.ship.AbstractShip;
+import solarpost.ship.ship.CargoShip;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public abstract class AbstractPostOffice {
         this.name = name;
     }
 
-    synchronized public void dockTradeAndLaunch(AbstractShip dockedShip, Predicate<SolarMail> filter){
+    synchronized public void dockTradeAndLaunch(CargoShip dockedShip, Predicate<SolarMail> filter){
         CargoStorage shipCargo = dockedShip.getStorage();
 
         beforeTrade(dockedShip);
@@ -61,10 +61,10 @@ public abstract class AbstractPostOffice {
         dockedShip.launch(this);
     }
 
-    protected void beforeTrade(AbstractShip ship){}
+    protected void beforeTrade(CargoShip ship){}
 
     protected abstract void doTrade(CargoStorage ship, Predicate<SolarMail> filter);
 
-    protected void afterTrade(AbstractShip ship){}
+    protected void afterTrade(CargoShip ship){}
 
 }
