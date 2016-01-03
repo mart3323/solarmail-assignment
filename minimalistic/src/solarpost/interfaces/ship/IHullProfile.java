@@ -1,4 +1,4 @@
-package interfaces.ship;
+package solarpost.interfaces.ship;
 
 import solarpost.station.AbstractPostOffice;
 

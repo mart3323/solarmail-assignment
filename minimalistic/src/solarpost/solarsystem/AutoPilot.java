@@ -5,6 +5,11 @@ import solarpost.route.Node;
 import solarpost.ship.CargoShip;
 import solarpost.station.ScannerPostOffice;
 
+/**
+ * An autopilot, instantiated with a ship and a Route (Node), keeps travelling the route forever,
+ * <br>stopping at each station and skipping to the next ScannerSellingStation when the scanner durability goes below 10 (2.5 uses)
+ * <br><img src=EDH-PlanetaryLanding.jpg />
+ */
 public class AutoPilot extends Thread{
     public static final int FLIGHT_TIME_MS = 15;
     public static final int SCANNER_CHANGE_THRESHOLD = 10;

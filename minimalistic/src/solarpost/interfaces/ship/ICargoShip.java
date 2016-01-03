@@ -1,6 +1,6 @@
-package interfaces.ship;
+package solarpost.interfaces.ship;
 
-import interfaces.misc.IStorage;
+import solarpost.interfaces.misc.IStorage;
 import solarpost.misc.CargoStorage;
 import solarpost.misc.SolarMail;
 import solarpost.station.AbstractPostOffice;

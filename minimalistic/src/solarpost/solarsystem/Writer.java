@@ -1,16 +1,17 @@
 package solarpost.solarsystem;
 
+import solarpost.interfaces.station.IPostOffice;
 import solarpost.station.AbstractPostOffice;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Writer extends Thread{
-    List<AbstractPostOffice> dests;
+    List<IPostOffice> dests;
     private int toWrite = 2000;
 
-    public Writer(ArrayList<AbstractPostOffice> dests) {
-        this.dests = (ArrayList<AbstractPostOffice>)dests.clone();
+    public Writer(ArrayList<IPostOffice> dests) {
+        this.dests = new ArrayList<>(dests);
     }
 
 
@@ -18,8 +19,8 @@ public class Writer extends Thread{
     public void run() {
         try {
             while(this.toWrite > 0) {
-                AbstractPostOffice source = getRandomSource();
-                AbstractPostOffice destination = getRandomDest(source);
+                IPostOffice source = getRandomSource();
+                IPostOffice destination = getRandomDest(source);
                 int weight = getRandomWeight();
                 source.addPackage(destination, weight);
                 Thread.sleep(3);
@@ -30,18 +31,22 @@ public class Writer extends Thread{
         }
     }
 
-    public AbstractPostOffice getRandomSource() {
-        return dests.get((int)Math.floor(dests.size()*Math.random()));
+    public IPostOffice getRandomSource() {
+        return dests.get(randomIntInRange(dests.size()));
     }
     public int getRandomWeight() {
-        return (int)Math.floor(Math.random()*80);
+        return randomIntInRange(80);
     }
 
-    public AbstractPostOffice getRandomDest(AbstractPostOffice source) {
+    public IPostOffice getRandomDest(IPostOffice source) {
         dests.remove(source);
-        final AbstractPostOffice target = dests.get((int) Math.floor(dests.size() * Math.random()));
+        final IPostOffice target = this.getRandomSource();
         dests.add(source);
         return target;
+    }
+
+    private int randomIntInRange(int range) {
+        return (int) Math.floor(range * Math.random());
     }
 
     public int getToWrite() {

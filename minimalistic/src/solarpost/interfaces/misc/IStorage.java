@@ -1,4 +1,4 @@
-package interfaces.misc;
+package solarpost.interfaces.misc;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

@@ -6,6 +6,10 @@ import solarpost.ship.CargoShip;
 
 import java.util.function.Predicate;
 
+/**
+ * A variant of the regular post office that also sells scanners
+ * <p> Any docking ship will receive a new scanner if their public .autoBuyScanner property is set to true
+ */
 public class ScannerPostOffice extends PostOffice {
     public ScannerPostOffice(String name) {
         super(name);

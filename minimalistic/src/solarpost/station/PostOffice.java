@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static solarpost.station.AbstractPostOffice.TempClass.Normal;
+import static solarpost.interfaces.station.IPostOffice.TempClass.Normal;
 
 public class PostOffice extends AbstractPostOffice{
 

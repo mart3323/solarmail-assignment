@@ -1,4 +1,5 @@
 package solarpost.misc;
+import solarpost.interfaces.station.IPostOffice;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import solarpost.station.AbstractPostOffice;
 
@@ -14,11 +15,11 @@ import solarpost.station.AbstractPostOffice;
  */
 @Immutable
 public class SolarMail {
-    public final AbstractPostOffice source;
-    public final AbstractPostOffice target;
+    public final IPostOffice source;
+    public final IPostOffice target;
     public final int weight;
 
-    public SolarMail(AbstractPostOffice source, AbstractPostOffice target, int weight) {
+    public SolarMail(IPostOffice source, IPostOffice target, int weight) {
         this.source = source;
         this.target = target;
         this.weight = weight;

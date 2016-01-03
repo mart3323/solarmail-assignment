@@ -1,7 +1,6 @@
-package interfaces.misc;
+package solarpost.interfaces.misc;
 
 import solarpost.misc.SolarMail;
-import solarpost.misc.Storage;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

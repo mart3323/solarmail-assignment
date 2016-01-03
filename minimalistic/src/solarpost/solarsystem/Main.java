@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static solarpost.station.AbstractPostOffice.TempClass.Normal;
+import static solarpost.interfaces.station.IPostOffice.TempClass.Normal;
 
 public class Main {
 
@@ -60,7 +60,7 @@ public class Main {
         writer.start();
         ships.forEach(shipExecutor::submit);
 
-        System.out.println("unwritten → waiting → in_transit → delivered");
+        System.out.printf("%12s → %12s → %12s → %12s%n", "Unwritten", "Waiting", "In transit", "Delivered");
         while(worldIsAlive(stations, ships, writer) || writer.isAlive()){
             Thread.sleep(500);
         }
@@ -115,7 +115,7 @@ public class Main {
         }
         System.out.print(RESET_LINE);
         final int notWritten = writer.getToWrite();
-        System.out.printf("%4d → %4d → %4d → %4d ", notWritten, waiting, transit, delivered);
+        System.out.printf("%12d → %12d → %12d → %12d ", notWritten, waiting, transit, delivered);
         return notWritten + transit + waiting > 0;
     }
 }

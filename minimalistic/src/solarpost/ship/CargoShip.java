@@ -1,7 +1,7 @@
 package solarpost.ship;
 
-import interfaces.ship.ICargoShip;
-import interfaces.ship.IHullProfile;
+import solarpost.interfaces.ship.ICargoShip;
+import solarpost.interfaces.ship.IHullProfile;
 import solarpost.misc.CargoStorage;
 import solarpost.misc.SolarMail;
 import solarpost.station.AbstractPostOffice;
@@ -9,6 +9,14 @@ import solarpost.station.AbstractPostOffice;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/**
+ * A general description of a cargo ship's behaviour
+ * <p>This class does not represent any specific ship..,
+ * rather it must be instantiated with a specific {@link IHullProfile}
+ *
+ * @see RegularHull
+ * @see HeatShieldedHull
+ */
 public class CargoShip implements ICargoShip{
     protected final CargoStorage storage;
     public boolean autobuyScanner = false;

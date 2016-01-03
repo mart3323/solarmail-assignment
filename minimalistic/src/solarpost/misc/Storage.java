@@ -1,6 +1,6 @@
 package solarpost.misc;
 
-import interfaces.misc.IStorage;
+import solarpost.interfaces.misc.IStorage;
 
 import java.util.HashSet;
 import java.util.Set;

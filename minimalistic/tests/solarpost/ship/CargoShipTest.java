@@ -1,6 +1,6 @@
 package solarpost.ship;
 
-import interfaces.ship.IHullProfile;
+import solarpost.interfaces.ship.IHullProfile;
 import org.junit.Before;
 import org.junit.Test;
 import solarpost.misc.SolarMail;

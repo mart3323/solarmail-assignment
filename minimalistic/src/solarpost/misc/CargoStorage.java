@@ -1,6 +1,6 @@
 package solarpost.misc;
 
-import interfaces.misc.ICargoStorage;
+import solarpost.interfaces.misc.ICargoStorage;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
