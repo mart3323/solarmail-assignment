@@ -1,7 +1,7 @@
-package solarpost.misc;
+package solarpost.code.misc;
 import solarpost.interfaces.station.IPostOffice;
 import jdk.nashorn.internal.ir.annotations.Immutable;
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.station.AbstractPostOffice;
 
 /**
  * An immutable struct representing a single item of solar mail

@@ -1,6 +1,7 @@
-package solarpost.route;
+package solarpost.code.route;
 
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 /**
  * This is essentially a linked list node, but specifically for {@link AbstractPostOffice}s,
@@ -9,9 +10,9 @@ import solarpost.station.AbstractPostOffice;
 public class Node {
     public Node next;
     public Node last;
-    public AbstractPostOffice postOffice;
+    public IPostOffice postOffice;
 
-    public Node(AbstractPostOffice postOffice) {
+    public Node(IPostOffice postOffice) {
         this.postOffice = postOffice;
     }
 }

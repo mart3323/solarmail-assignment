@@ -1,16 +1,15 @@
-package solarpost.solarsystem;
+package solarpost.code.solarsystem;
 
 import solarpost.interfaces.station.IPostOffice;
-import solarpost.station.AbstractPostOffice;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Writer extends Thread{
-    List<IPostOffice> dests;
+    private final List<IPostOffice> dests;
     private int toWrite = 2000;
 
-    public Writer(ArrayList<IPostOffice> dests) {
+    public Writer(ArrayList<? extends IPostOffice> dests) {
         this.dests = new ArrayList<>(dests);
     }
 
@@ -31,14 +30,14 @@ public class Writer extends Thread{
         }
     }
 
-    public IPostOffice getRandomSource() {
+    private IPostOffice getRandomSource() {
         return dests.get(randomIntInRange(dests.size()));
     }
-    public int getRandomWeight() {
+    private int getRandomWeight() {
         return randomIntInRange(80);
     }
 
-    public IPostOffice getRandomDest(IPostOffice source) {
+    private IPostOffice getRandomDest(IPostOffice source) {
         dests.remove(source);
         final IPostOffice target = this.getRandomSource();
         dests.add(source);

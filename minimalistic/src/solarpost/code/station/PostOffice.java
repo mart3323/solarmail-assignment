@@ -1,9 +1,9 @@
-package solarpost.station;
+package solarpost.code.station;
 
 
-import solarpost.misc.CargoStorage;
-import solarpost.ship.CargoShip;
-import solarpost.misc.SolarMail;
+import solarpost.code.misc.CargoStorage;
+import solarpost.code.ship.CargoShip;
+import solarpost.code.misc.SolarMail;
 
 import java.util.Map;
 import java.util.function.Predicate;

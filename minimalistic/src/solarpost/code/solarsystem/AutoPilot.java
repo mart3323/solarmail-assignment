@@ -1,18 +1,18 @@
-package solarpost.solarsystem;
+package solarpost.code.solarsystem;
 
-import solarpost.misc.SolarMail;
-import solarpost.route.Node;
-import solarpost.ship.CargoShip;
-import solarpost.station.ScannerPostOffice;
+import solarpost.code.misc.SolarMail;
+import solarpost.code.route.Node;
+import solarpost.code.ship.CargoShip;
+import solarpost.code.station.ScannerPostOffice;
 
 /**
  * An autopilot, instantiated with a ship and a Route (Node), keeps travelling the route forever,
  * <br>stopping at each station and skipping to the next ScannerSellingStation when the scanner durability goes below 10 (2.5 uses)
- * <br><img src=EDH-PlanetaryLanding.jpg />
+ * <br><img src=../../images/EDH-PlanetaryLanding.jpg />
  */
 public class AutoPilot extends Thread{
-    public static final int FLIGHT_TIME_MS = 15;
-    public static final int SCANNER_CHANGE_THRESHOLD = 10;
+    private static final int FLIGHT_TIME_MS = 15;
+    private static final int SCANNER_CHANGE_THRESHOLD = 10;
     public final String name;
     public final CargoShip ship;
     private Node route;

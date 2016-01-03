@@ -1,4 +1,4 @@
-package solarpost.station;
+package solarpost.code.station;
 
 import static solarpost.interfaces.station.IPostOffice.TempClass.Hot;
 

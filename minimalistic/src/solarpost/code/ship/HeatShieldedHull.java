@@ -1,7 +1,7 @@
-package solarpost.ship;
+package solarpost.code.ship;
 
 import solarpost.interfaces.ship.IHullProfile;
-import solarpost.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.function.Function;
 
@@ -36,7 +36,7 @@ import java.util.function.Function;
  *            </table>
  *         </td>
  *         <td>
- *             <img style=float:right src="diamondback_scout.png">
+ *             <img style=float:right src="../../images/diamondback_scout.png">
  *         </td>
  *     </tr>
  * </table>
@@ -48,12 +48,12 @@ public class HeatShieldedHull implements IHullProfile {
     @Override public int getCargoCapacity() { return 80; }
 
     @Override
-    public Function<AbstractPostOffice, Integer> getScannerWearPattern() {
+    public Function<IPostOffice, Integer> getScannerWearPattern() {
         return p -> 4;
     }
 
     @Override
-    public Function<AbstractPostOffice, Integer> getFuelConsumptionPattern() {
+    public Function<IPostOffice, Integer> getFuelConsumptionPattern() {
         return p -> {
             switch (p.getTempClass()) {
                 case Hot:

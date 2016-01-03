@@ -1,11 +1,9 @@
-package solarpost.misc;
+package solarpost.code.misc;
 
 import org.junit.*;
 import org.junit.rules.ExpectedException;
-import solarpost.station.AbstractPostOffice;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 
 public class CargoStorageTest {
 
@@ -14,21 +12,17 @@ public class CargoStorageTest {
     private SolarMail p2;
     private SolarMail p3;
     private SolarMail p4;
-    private AbstractPostOffice office1;
-    private AbstractPostOffice office2;
 
     @Rule
-    public ExpectedException exp = ExpectedException.none();
+    public final ExpectedException exp = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
         this.storage = new CargoStorage(80);
-        this.office1 = mock(AbstractPostOffice.class);
-        this.office2 = mock(AbstractPostOffice.class);
-        this.p1 = new SolarMail(office1, office2, 1);
-        this.p2 = new SolarMail(office2, office2, 10);
-        this.p3 = new SolarMail(office2, office1, 50);
-        this.p4 = new SolarMail(office1, office1, 70);
+        this.p1 = new SolarMail(null, null, 1);
+        this.p2 = new SolarMail(null, null, 10);
+        this.p3 = new SolarMail(null, null, 50);
+        this.p4 = new SolarMail(null, null, 70);
         this.storage.getLock().writeLock().lock();
     }
 

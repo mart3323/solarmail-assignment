@@ -1,15 +1,16 @@
-package solarpost.solarsystem;
+package solarpost.code.solarsystem;
 
-import solarpost.misc.CargoStorage;
-import solarpost.route.Node;
-import solarpost.route.Route;
-import solarpost.ship.CargoShip;
-import solarpost.ship.HeatShieldedHull;
-import solarpost.ship.RegularHull;
-import solarpost.station.AbstractPostOffice;
-import solarpost.station.HotPostOffice;
-import solarpost.station.PostOffice;
-import solarpost.station.ScannerPostOffice;
+import solarpost.code.misc.CargoStorage;
+import solarpost.code.route.Node;
+import solarpost.code.route.Route;
+import solarpost.code.ship.CargoShip;
+import solarpost.code.ship.HeatShieldedHull;
+import solarpost.code.ship.RegularHull;
+import solarpost.code.station.AbstractPostOffice;
+import solarpost.code.station.HotPostOffice;
+import solarpost.code.station.PostOffice;
+import solarpost.code.station.ScannerPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -22,13 +23,13 @@ public class Main {
 
     public static final String RESET_LINE = "1%\r";
 
-    public static Node everywhereRoute(ArrayList<AbstractPostOffice> stations){
-        return Route.create(stations.toArray(new AbstractPostOffice[stations.size()]));
+    private static Node everywhereRoute(ArrayList<? extends IPostOffice> stations){
+        return Route.create(stations.toArray(new IPostOffice[stations.size()]));
     }
 
-    public static Node notHotRoute(ArrayList<AbstractPostOffice> stations){
-        final List<AbstractPostOffice> offices = stations.stream().filter(p -> p.getTempClass() == Normal).collect(Collectors.toList());
-        return Route.create(offices.toArray(new AbstractPostOffice[offices.size()]));
+    private static Node notHotRoute(ArrayList<? extends IPostOffice> stations){
+        final List<IPostOffice> offices = stations.stream().filter(p -> p.getTempClass() == Normal).collect(Collectors.toList());
+        return Route.create(offices.toArray(new IPostOffice[offices.size()]));
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -45,7 +46,6 @@ public class Main {
         stations.add(new HotPostOffice("Mercury"));
         stations.add(new HotPostOffice("Venus"));
 
-        final ExecutorService writerExecutor = Executors.newFixedThreadPool(30);
         final ExecutorService shipExecutor = Executors.newFixedThreadPool(30);
 
         ArrayList<AutoPilot> ships = new ArrayList<>();
@@ -102,7 +102,7 @@ public class Main {
         // then the packages must have been delivered, because packages can't move upstream or horizontally
         int delivered = 0;
         int waiting = 0;
-        for (AbstractPostOffice station : stations) {
+        for (IPostOffice station : stations) {
             delivered += station.getInbox(p -> true, Collectors.summingInt(p -> 1));
             waiting += station.getOutbox(p -> true, Collectors.summingInt(p -> 1));
         }

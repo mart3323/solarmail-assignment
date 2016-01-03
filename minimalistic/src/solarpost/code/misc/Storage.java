@@ -1,4 +1,4 @@
-package solarpost.misc;
+package solarpost.code.misc;
 
 import solarpost.interfaces.misc.IStorage;
 
@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Storage<T> implements IStorage<T> {
-    ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
-    HashSet<T> items = new HashSet<>();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+    private final HashSet<T> items = new HashSet<>();
 
     public Set<T> getItemsBy(Predicate<T> filter){
         this.lock.readLock().lock();

@@ -1,10 +1,10 @@
-package solarpost.ship;
+package solarpost.code.ship;
 
 import solarpost.interfaces.ship.ICargoShip;
 import solarpost.interfaces.ship.IHullProfile;
-import solarpost.misc.CargoStorage;
-import solarpost.misc.SolarMail;
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.misc.CargoStorage;
+import solarpost.code.misc.SolarMail;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -18,14 +18,14 @@ import java.util.function.Predicate;
  * @see HeatShieldedHull
  */
 public class CargoShip implements ICargoShip{
-    protected final CargoStorage storage;
+    private final CargoStorage storage;
     public boolean autobuyScanner = false;
     private int fuel;
     private int scanner;
     private final int MAX_FUEL;
     private final int MAX_SCANNER;
-    private final Function<AbstractPostOffice, Integer> scannerWear;
-    private final Function<AbstractPostOffice, Integer> fuelConsumption;
+    private final Function<IPostOffice, Integer> scannerWear;
+    private final Function<IPostOffice, Integer> fuelConsumption;
 
     /**
      * Builds a new ship according to the specified Hull profile
@@ -40,7 +40,7 @@ public class CargoShip implements ICargoShip{
         this.storage = new CargoStorage(hull.getCargoCapacity());
     }
 
-    public void dockAt(AbstractPostOffice office, Predicate<SolarMail> filter){
+    public void dockAt(IPostOffice office, Predicate<SolarMail> filter){
         office.dockTradeAndLaunch(this, filter);
     }
 
@@ -55,7 +55,7 @@ public class CargoShip implements ICargoShip{
     public int getFuel() { return this.fuel; }
 
 
-    public void launch(AbstractPostOffice office) {
+    public void launch(IPostOffice office) {
         this.fuel -= this.fuelConsumption.apply(office);
         this.scanner -= this.scannerWear.apply(office);
         if(this.fuel < 0){

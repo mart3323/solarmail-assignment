@@ -1,7 +1,7 @@
 package solarpost.interfaces.station;
 
-import solarpost.misc.SolarMail;
-import solarpost.ship.CargoShip;
+import solarpost.code.misc.SolarMail;
+import solarpost.code.ship.CargoShip;
 
 import java.util.function.Predicate;
 import java.util.stream.Collector;

@@ -1,7 +1,7 @@
-package solarpost.ship;
+package solarpost.code.ship;
 
 import solarpost.interfaces.ship.IHullProfile;
-import solarpost.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.function.Function;
 
@@ -32,7 +32,7 @@ import java.util.function.Function;
  *               </table>
  *            </td>
  *            <td>
- *                <img style=float:right src="FederalDropship.jpg">
+ *                <img style=float:right src="../../images/FederalDropship.jpg">
  *            </td>
  *        </tr>
  *  </table>
@@ -44,12 +44,12 @@ public class RegularHull implements IHullProfile {
     @Override public int getCargoCapacity() { return 100; }
 
     @Override
-    public Function<AbstractPostOffice, Integer> getScannerWearPattern() {
+    public Function<IPostOffice, Integer> getScannerWearPattern() {
         return p -> 4;
     }
 
     @Override
-    public Function<AbstractPostOffice, Integer> getFuelConsumptionPattern() {
+    public Function<IPostOffice, Integer> getFuelConsumptionPattern() {
         return p -> {
             switch (p.getTempClass()) {
                 case Normal:

@@ -1,4 +1,4 @@
-package solarpost.misc;
+package solarpost.code.misc;
 
 import solarpost.interfaces.misc.ICargoStorage;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CargoStorage implements ICargoStorage {
     private final int capacity;
-    private Storage<SolarMail> items = new Storage<>();
+    private final Storage<SolarMail> items = new Storage<>();
 
     public CargoStorage(int i) {
         capacity = i;

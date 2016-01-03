@@ -1,6 +1,6 @@
 package solarpost.interfaces.misc;
 
-import solarpost.misc.SolarMail;
+import solarpost.code.misc.SolarMail;
 
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -15,21 +15,21 @@ public interface ICargoStorage {
      * Returns the Lock in use by this CargoStorage - this only needs to be called if multiple actions have to be synchronized
      * <br>(for example read-then-remove)
      */
-    public ReentrantReadWriteLock getLock() throws IllegalStateException;
+    ReentrantReadWriteLock getLock() throws IllegalStateException;
 
     /**
      * Get (a clone of) the set of items in this storage
      * @return A cloned set of all the items in this storage
      * @throws IllegalStateException if the read lock hasn't been manually acquired
      */
-    public Set<SolarMail> getItems() throws IllegalStateException;
+    Set<SolarMail> getItems() throws IllegalStateException;
 
     /**
      * Attempts to add a {@link SolarMail} to this storage
      * @return true if there was enough space and the mail was added, false if there wasn't enough space
      * @throws IllegalStateException if the write lock hasn't been manually acquired
      */
-    public boolean tryAdd(SolarMail mail) throws IllegalStateException;
+    boolean tryAdd(SolarMail mail) throws IllegalStateException;
 
     /**
      * Adds a {@link SolarMail} to this storage
@@ -37,12 +37,12 @@ public interface ICargoStorage {
      * @throws IllegalStateException if the write lock hasn't been manually acquired
      * @throws RuntimeException if there wasn't enough space to add the item
      */
-    public void add(SolarMail mail) throws IllegalStateException, RuntimeException;
+    void add(SolarMail mail) throws IllegalStateException, RuntimeException;
 
     /**
      * Removes a {@link SolarMail} from this storage
      * @throws IllegalStateException if the wrote lock hasn't been manually acquired
      */
-    public void remove(SolarMail mail) throws IllegalStateException;
+    void remove(SolarMail mail) throws IllegalStateException;
 
 }

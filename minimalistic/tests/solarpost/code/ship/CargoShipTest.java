@@ -1,10 +1,11 @@
-package solarpost.ship;
+package solarpost.code.ship;
 
 import solarpost.interfaces.ship.IHullProfile;
 import org.junit.Before;
 import org.junit.Test;
-import solarpost.misc.SolarMail;
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.misc.SolarMail;
+import solarpost.code.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static solarpost.station.AbstractPostOffice.TempClass.Normal;
+import static solarpost.interfaces.station.IPostOffice.TempClass.Normal;
 
 public class CargoShipTest {
 
@@ -24,8 +25,8 @@ public class CargoShipTest {
     @Before
     public void setUp() throws Exception {
         this.ship = new CargoShip(new IHullProfile() {
-            @Override public Function<AbstractPostOffice, Integer> getScannerWearPattern() { return i -> i.getTempClass().ordinal(); }
-            @Override public Function<AbstractPostOffice, Integer> getFuelConsumptionPattern() { return i -> i.getTempClass().ordinal()*2; }
+            @Override public Function<IPostOffice, Integer> getScannerWearPattern() { return i -> i.getTempClass().ordinal(); }
+            @Override public Function<IPostOffice, Integer> getFuelConsumptionPattern() { return i -> i.getTempClass().ordinal()*2; }
             @Override public int getMaxFuel() { return 10; }
             @Override public int getMaxScanner() { return 10; }
             @Override public int getCargoCapacity() { return 10; }

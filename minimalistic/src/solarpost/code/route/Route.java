@@ -1,6 +1,6 @@
-package solarpost.route;
+package solarpost.code.route;
 
-import solarpost.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 public class Route {
     /**
@@ -8,13 +8,12 @@ public class Route {
      * @param stations stations to make {@link Node}s of
      * @return the first Node of the circular linked list
      */
-    public static Node create(AbstractPostOffice... stations){
+    public static Node create(IPostOffice... stations){
         Node[] nodes = new Node[stations.length];
         for (int i = 0; i < stations.length; i++) {
             nodes[i] = new Node(stations[i]);
         }
         for (int i = 0; i < nodes.length - 1; i++) {
-            Node node = nodes[i];
             nodes[i].next = nodes[i+1];
             nodes[i+1].last = nodes[i];
         }

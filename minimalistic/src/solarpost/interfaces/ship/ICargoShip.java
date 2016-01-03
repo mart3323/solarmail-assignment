@@ -1,9 +1,10 @@
 package solarpost.interfaces.ship;
 
 import solarpost.interfaces.misc.IStorage;
-import solarpost.misc.CargoStorage;
-import solarpost.misc.SolarMail;
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.misc.CargoStorage;
+import solarpost.code.misc.SolarMail;
+import solarpost.code.station.AbstractPostOffice;
+import solarpost.interfaces.station.IPostOffice;
 
 import java.util.function.Predicate;
 
@@ -20,11 +21,11 @@ public interface ICargoShip {
     CargoStorage getStorage();
 
     /**
-     * Visits the Post offiec specified, picking up only packages matching filter
+     * Visits the Post office specified, picking up only packages matching filter
      * @param office {@link AbstractPostOffice} to land at
      * @param filter predicate to test cargo against before allowing it onboard
      */
-    void dockAt(AbstractPostOffice office, Predicate<SolarMail> filter);
+    void dockAt(IPostOffice office, Predicate<SolarMail> filter);
 
     int getScannerDurability();
     int getFuel();
@@ -44,5 +45,5 @@ public interface ICargoShip {
      * consuming fuel and wearing the scanner according to this ship's Hull profile
      * @throws RuntimeException if the ship runs out of fuel or the scanner fails on takeoff
      */
-    void launch(AbstractPostOffice office) throws RuntimeException;
+    void launch(IPostOffice office) throws RuntimeException;
 }

@@ -1,9 +1,9 @@
-package solarpost.station;
+package solarpost.code.station;
 
 import solarpost.interfaces.station.IPostOffice;
-import solarpost.misc.CargoStorage;
-import solarpost.misc.SolarMail;
-import solarpost.ship.CargoShip;
+import solarpost.code.misc.CargoStorage;
+import solarpost.code.misc.SolarMail;
+import solarpost.code.ship.CargoShip;
 
 import java.util.Set;
 import java.util.function.Predicate;
@@ -14,8 +14,8 @@ import java.util.stream.Collector;
  * for both outgoing and incoming mail
  */
 public abstract class AbstractPostOffice implements IPostOffice {
-    CargoStorage outbox = new CargoStorage(Integer.MAX_VALUE);
-    CargoStorage inbox = new CargoStorage(Integer.MAX_VALUE);
+    final CargoStorage outbox = new CargoStorage(Integer.MAX_VALUE);
+    final CargoStorage inbox = new CargoStorage(Integer.MAX_VALUE);
     public final String name;
 
     public AbstractPostOffice(String name) {
@@ -50,7 +50,9 @@ public abstract class AbstractPostOffice implements IPostOffice {
     /**
      * Actions to perform on the ship before trading
      * <br>Anything that does not require cargo lock should be done here or {@link #afterTrade}
+     * @param ship the docked ship
      */
+    @SuppressWarnings("UnusedParameters") // Parameters necessary for future overriding subclasses
     protected void beforeTrade(CargoShip ship){}
 
     /**

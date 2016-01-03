@@ -1,21 +1,21 @@
-package solarpost.route;
+package solarpost.code.route;
 
 import org.junit.Test;
-import solarpost.station.AbstractPostOffice;
+import solarpost.code.station.AbstractPostOffice;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 public class RouteTest {
 
-    final AbstractPostOffice p1 = mock(AbstractPostOffice.class);
-    final AbstractPostOffice p2 = mock(AbstractPostOffice.class);
-    final AbstractPostOffice p3 = mock(AbstractPostOffice.class);
-    final AbstractPostOffice p4 = mock(AbstractPostOffice.class);
-    final Node n1= Route.create(p1, p2, p3, p4);
-    final Node n2 = n1.next;
-    final Node n3 = n1.next.next;
-    final Node n4 = n1.next.next.next;
+    private final AbstractPostOffice p1 = mock(AbstractPostOffice.class);
+    private final AbstractPostOffice p2 = mock(AbstractPostOffice.class);
+    private final AbstractPostOffice p3 = mock(AbstractPostOffice.class);
+    private final AbstractPostOffice p4 = mock(AbstractPostOffice.class);
+    private final Node n1= Route.create(p1, p2, p3, p4);
+    private final Node n2 = n1.next;
+    private final Node n3 = n1.next.next;
+    private final Node n4 = n1.next.next.next;
     @Test
     public void testIsProperlyLinked() throws Exception {
         // n1-n4 are already defined in terms of .next, check if .last matches

@@ -1,8 +1,7 @@
-package solarpost.misc;
+package solarpost.code.misc;
 
 import org.junit.Before;
 import org.junit.Test;
-import solarpost.misc.Storage;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,7 +14,7 @@ public class StorageTest {
 
     @Before
     public void setUp() throws Exception {
-        this.storage = new Storage<Integer>();
+        this.storage = new Storage<>();
         this.storage.add(5);
         this.storage.add(12);
         this.storage.add(-1);
