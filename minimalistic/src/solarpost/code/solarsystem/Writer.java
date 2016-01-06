@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Writer extends Thread{
+    public static final int MS_PER_PACKAGE = 3;
     private final List<IPostOffice> dests;
     private int toWrite = 2000;
 
@@ -22,7 +23,7 @@ public class Writer extends Thread{
                 IPostOffice destination = getRandomDest(source);
                 int weight = getRandomWeight();
                 source.addPackage(destination, weight);
-                Thread.sleep(3);
+                Thread.sleep(MS_PER_PACKAGE);
                 this.toWrite -= 1;
             }
         } catch (InterruptedException e) {

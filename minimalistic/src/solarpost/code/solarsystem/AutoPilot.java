@@ -1,9 +1,15 @@
 package solarpost.code.solarsystem;
 
+import solarpost.code.misc.CargoStorage;
 import solarpost.code.misc.SolarMail;
 import solarpost.code.route.Node;
 import solarpost.code.ship.CargoShip;
 import solarpost.code.station.ScannerPostOffice;
+import solarpost.interfaces.station.IPostOffice;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * An autopilot, instantiated with a ship and a Route (Node), keeps travelling the route forever,
@@ -16,7 +22,6 @@ public class AutoPilot extends Thread{
     public final String name;
     public final CargoShip ship;
     private Node route;
-
 
     public AutoPilot(String name, CargoShip ship, Node route) {
         this.name = name;
@@ -38,13 +43,39 @@ public class AutoPilot extends Thread{
     }
 
     private void selectNextDestination() {
-        if(needScanner()){
-            do {
-                this.route = this.route.next;
-            } while(!(this.route.postOffice instanceof ScannerPostOffice));
+        final Optional<IPostOffice> bestDestination = findBestDestination();
+        Predicate<IPostOffice> predicate;
+        if (bestDestination.isPresent()) {
+            predicate = n -> n == bestDestination.get();
+        } else if (needScanner()){
+            predicate = n -> n instanceof ScannerPostOffice;
         } else {
-            this.route = this.route.next;
+            predicate = n -> true;
         }
+
+        do {
+            this.route = this.route.next;
+        } while (!predicate.test(this.route.postOffice));
+    }
+
+    private Optional<IPostOffice> findBestDestination() {
+        Map<IPostOffice, Integer> weightByDestination;
+        final CargoStorage storage;
+
+        storage = this.ship.getStorage();
+        storage.getLock().readLock().lock();
+        weightByDestination = storage.getItems().parallelStream()
+                .collect(Collectors.groupingBy(p -> p.target, Collectors.summingInt(p -> p.weight)));
+        storage.getLock().readLock().unlock();
+        if(this.needScanner()){
+            final Set<IPostOffice> toRemove = weightByDestination.keySet().stream()
+                    .filter(station -> !(station instanceof ScannerPostOffice)).collect(Collectors.toSet());
+            toRemove.forEach(weightByDestination::remove);
+        }
+        return weightByDestination.entrySet().stream()
+                .sorted((a, b) -> b.getValue() - a.getValue())
+                .map(Map.Entry::getKey)
+                .findFirst();
     }
 
     private boolean needScanner() {
